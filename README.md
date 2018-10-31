@@ -4,7 +4,7 @@
 
 ### Use systemd in centos:7 containers
 
-Based on [this documentation (section `Systemd integration`)](https://hub.docker.com/_/centos/).
+Based on [this documentation (section `Systemd integration`)](https://hub.docker.com/_/centos/) and [this post](https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/).
 
 ### Self-signed certificates for TLS
 
