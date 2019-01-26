@@ -1,0 +1,55 @@
+https://github.com/moby/moby/issues/30723
+https://forums.docker.com/t/any-simple-and-safe-way-to-start-services-on-centos7-systemd/5695/11
+https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/
+https://hub.docker.com/_/centos/
+
+docker run -p 8080:80 -d -e=container=docker --stop-signal=SIGRTMIN+3 --cap-add=SYS_ADMIN --security-opt=seccomp:unconfined -v /sys/fs/cgroup:/sys/fs/cgroup:ro docker-centos-httpd
+docker run -p 8080:8080 -p 8443:8443 -d --cap-add=SYS_ADMIN -v /sys/fs/cgroup:/sys/fs/cgroup:ro docker-centos-httpd
+
+docker exec -u 0 -it loving_leakey bash
+
+https://www.digitalocean.com/community/tutorials/how-to-create-an-ssl-certificate-on-apache-for-centos-7
+yum install mod_ssl
+mkdir /etc/ssl/private
+chmod 700 /etc/ssl/private
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt -subj '/CN=localhost'
+openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+cp /etc/ssl/certs/apache-selfsigned.crt .
+cat /etc/ssl/certs/dhparam.pem | tee -a /etc/ssl/certs/apache-selfsigned.crt
+cp /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.bak
+vi /etc/httpd/conf.d/non-ssl.conf
+apachectl configtest
+systemctl restart httpd.service
+curl localhost:80
+curl -L --cacert ./apache-selfsigned.crt http://localhost/
+curl --cacert ./apache-selfsigned.crt https://localhost/
+
+change port numbers:
+/etc/httpd/conf.d/non-ssl.conf
+/etc/httpd/conf.d/ssl.conf
+/etc/httpd/conf/httpd.conf
+
+lsof -i -P
+COMMAND PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+httpd   319 root    3u  IPv4  44547      0t0  TCP *:7080 (LISTEN)
+httpd   319 root    4u  IPv4  44554      0t0  TCP *:7443 (LISTEN)
+
+docker run -it \
+   --name=tmp \
+   --cap-add=SYS_ADMIN \
+   -e "container=docker" \
+   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+   --tmpfs /run \
+   --tmpfs /run/lock \
+   ubuntu:16.04 /sbin/init
+
+https://security.stackexchange.com/questions/95178/diffie-hellman-parameters-still-calculating-after-24-hours
+
+cat >> /var/www/html/index.html
+<html>
+    <head>
+    </head>
+    <body>
+    Hello, nginx!
+    </body>
+</html>
